@@ -7,7 +7,7 @@ import datetime
 
 # -------------------- Page Config --------------------
 st.set_page_config(
-    page_title="Maharashtra CAP Dashboard",
+    page_title="Maharashtra CAPP Dashboard",
     layout="wide",
     initial_sidebar_state="expanded"
 )
