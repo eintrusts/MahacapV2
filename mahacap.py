@@ -491,6 +491,8 @@ def admin_panel():
         upload_basic = st.file_uploader("Upload any supporting documents for Basic Info", type=["pdf","xlsx","docx"], key="upload_basic")
 
         if st.button("Save Basic Info Data"):
+            if city_select not in st.session_state.city_data:
+                st.session_state.city_data[city_select] = {}
             st.session_state.city_data[city_select]["Basic Info"] = {
                 "Population":population,"Area":area,"GDP":gdp,"Density":density,"Climate_Zone":climate_zone,
                 "Admin":admin_structure,"CAP_Status":cap_status_form,"Last_Updated":last_updated_input.strftime("%B %Y"),
