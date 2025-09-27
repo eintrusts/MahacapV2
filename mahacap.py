@@ -656,17 +656,18 @@ def admin_panel():
             st.success("Climate Data saved successfully!")
 
         # Final Submit Button -> redirect to GHG Inventory page
-        if st.button("Submit All CAP Data"):
-            st.success("All CAP data submitted successfully! Redirecting to GHG Inventory page...")
-            st.experimental_set_query_params(page="ghg_inventory")
+        #if st.button("Submit All CAP Data"):
+         #   st.success("All CAP data submitted successfully! Redirecting to GHG Inventory page...") #Mayur
+          #  st.experimental_set_query_params(page="ghg_inventory")
 
        #Sudeep----------Generating GHG Files and Uploading it to Google Drive---------------
         from export_city_files import generate_ghg_excel, generate_ghg_pdf
         from drive_upload import get_or_create_folder, upload_file_to_folder
         
         if st.button("Submit All CAP Data"):
-            st.success("All CAP data submitted successfully! Generating GHG files and uploading to Google Drive...")
-        
+            st.success("All CAP data submitted successfully! Generating GHG files and uploading to Google Drive...") #Sudeep
+            st.experimental_set_query_params(page="ghg_inventory")
+            
             city_name = city_select  # Use the selected city name
             city_data = st.session_state.city_data[city_name]
         
