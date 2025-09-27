@@ -659,6 +659,31 @@ def admin_panel():
         if st.button("Submit All CAP Data"):
             st.success("All CAP data submitted successfully! Redirecting to GHG Inventory page...")
             st.experimental_set_query_params(page="ghg_inventory")
+
+       #Sudeep----------Generating GHG Files and Uploading it to Google Drive---------------
+        from export_city_files import generate_ghg_excel, generate_ghg_pdf
+        from drive_upload import get_or_create_folder, upload_file_to_folder
+        
+        if st.button("Submit All CAP Data"):
+            st.success("All CAP data submitted successfully! Generating GHG files and uploading to Google Drive...")
+        
+            city_name = city_select  # Use the selected city name
+            city_data = st.session_state.city_data[city_name]
+        
+            # 1. Generate files
+            xlsx_file = generate_ghg_excel(city_name, city_data)
+            pdf_file = generate_ghg_pdf(city_name, city_data)
+        
+            # 2. Google Drive: create/get folder
+            folder_id = get_or_create_folder(city_name)
+        
+            # 3. Upload files
+            xlsx_drive_id = upload_file_to_folder(xlsx_file, folder_id)
+            pdf_drive_id = upload_file_to_folder(pdf_file, folder_id)
+        
+            st.success(f"Files uploaded to Google Drive folder: {city_name}")
+        
+               
     # --- GHG Inventory ---
     with admin_tabs[2]:
         st.subheader("GHG Inventory")
