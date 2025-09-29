@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import datetime
 
 # Try Streamlit secrets first (Streamlit Cloud), fallback to environment variable or None
+parent_id = None
 try:
     PARENT_FOLDER_ID = st.secrets.get("PARENT_FOLDER_ID", None)
 except Exception:
