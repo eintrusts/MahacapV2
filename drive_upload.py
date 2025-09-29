@@ -3,14 +3,18 @@ import os
 from googleapiclient.http import MediaFileUpload
 from gdrive_auth import get_drive_service, set_public_permission
 
+def _escape_drive_query_value(s: str) -> str:
+    """Escape single quotes for Drive query."""
+    return s.replace("'", "\\'")
+
 def get_or_create_folder(city_name, parent_id=None):
     """
     Find existing folder named city_name (under parent if given), else create it.
     Returns folder_id.
     """
     service = get_drive_service()
-    # Prepare query - restrict to parent if provided
-    q = f"name = '{city_name.replace(\"'\",\"\\\\'\")}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+    safe_name = _escape_drive_query_value(city_name)
+    q = f"name = '{safe_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
     if parent_id:
         q += f" and '{parent_id}' in parents"
 
