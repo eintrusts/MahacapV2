@@ -1,14 +1,17 @@
+# export_city_files.py (optional improvement)
 import pandas as pd
 from fpdf import FPDF
+import os
+import tempfile
 
 def generate_ghg_excel(city_name, city_data):
     ghg_data = city_data.get("GHG", {})
     if not ghg_data:
-        # Option 1: Create a DataFrame with a message
         df = pd.DataFrame([{"message": "No GHG data available"}])
     else:
         df = pd.DataFrame([ghg_data])
-    file_name = f"{city_name}_ghg_inventory.xlsx"
+    fd, file_name = tempfile.mkstemp(suffix=f"_{city_name}_ghg_inventory.xlsx")
+    os.close(fd)
     df.to_excel(file_name, index=False)
     return file_name
 
@@ -24,6 +27,7 @@ def generate_ghg_pdf(city_name, city_data):
     else:
         for k, v in ghg_data.items():
             pdf.cell(200, 10, txt=f"{k}: {v}", ln=True)
-    file_name = f"{city_name}_ghg_inventory.pdf"
+    fd, file_name = tempfile.mkstemp(suffix=f"_{city_name}_ghg_inventory.pdf")
+    os.close(fd)
     pdf.output(file_name)
     return file_name
