@@ -456,6 +456,25 @@ def admin_panel():
                 }
                 st.success(f"{city_select} data saved successfully!")
 
+            #Loading previous state when city selected
+            from state_drive import load_state_json_from_folder
+            from drive_upload import get_or_create_folder
+            
+            # After city_select is chosen:
+            folder_id = get_or_create_folder(city_select, parent_id=PARENT_FOLDER_ID)
+            try:
+                saved = load_state_json_from_folder(folder_id)
+                if saved:
+                    # saved should be dict of city_data keys; merge into session_state safely
+                    for k, v in saved.items():
+                        # avoid overwriting in-progress edits - set defaults only if missing
+                        if k not in st.session_state or not st.session_state.get(k):
+                            st.session_state[k] = v
+                    st.info("Loaded saved state for city from Google Drive.")
+            except Exception as e:
+                # ignore errors, allow app to continue
+                st.warning(f"Could not load saved state for {city_select}: {e}")
+
 
     # --- Generate CAP  ---
     with admin_tabs[1]:
@@ -665,6 +684,14 @@ def admin_panel():
        #Sudeep----------Generating GHG Files and Uploading it to Google Drive---------------
         from export_city_files import generate_ghg_excel, generate_ghg_pdf
         from drive_upload import get_or_create_folder, upload_file_to_folder
+        from state_drive import save_state_json_to_folder
+
+        # assume city_name and city_data are defined and populated from form
+        PARENT_FOLDER_ID = None
+        try:
+            PARENT_FOLDER_ID = st.secrets.get("PARENT_FOLDER_ID")
+        except Exception:
+            PARENT_FOLDER_ID = os.environ.get("PARENT_FOLDER_ID")
         
         if st.button("Submit All CAP Data"):
             st.success("All CAP data submitted successfully! Generating GHG files and uploading to Google Drive...") #Sudeep
@@ -679,12 +706,38 @@ def admin_panel():
         
             # 2. Google Drive: create/get folder
             folder_id = get_or_create_folder(city_name)
-        
+
+            # 3) save application state to Drive for this city (state.json)
+            try:
+                save_state_json_to_folder(folder_id, city_data)
+            except Exception as e:
+                st.warning(f"Could not save state.json to Drive: {e}")
+
+            # 4) upload generated files
+            try:
+                uploaded_pdf = upload_file_to_folder(pdf_path, folder_id, make_public=False)
+                uploaded_xlsx = upload_file_to_folder(xlsx_path, folder_id, make_public=False)
+                st.success("Files uploaded to Google Drive.")
+                st.write("Open folder:", f"https://drive.google.com/drive/folders/{folder_id}")
+                # show webViewLink if available
+                if uploaded_pdf.get("webViewLink"):
+                    st.write("PDF link:", uploaded_pdf.get("webViewLink"))
+                if uploaded_xlsx.get("webViewLink"):
+                    st.write("Excel link:", uploaded_xlsx.get("webViewLink"))
+            except Exception as e:
+                st.error(f"Upload failed: {e}")
+
+            # 5) cleanup local temp files (optional)
+            try:
+                os.remove(pdf_path)
+                os.remove(xlsx_path)
+            except Exception:
+                pass
+            
             # 3. Upload files
-            xlsx_drive_id = upload_file_to_folder(xlsx_file, folder_id)
-            pdf_drive_id = upload_file_to_folder(pdf_file, folder_id)
-        
-            st.success(f"Files uploaded to Google Drive folder: {city_name}")
+            #xlsx_drive_id = upload_file_to_folder(xlsx_file, folder_id)
+            #pdf_drive_id = upload_file_to_folder(pdf_file, folder_id)
+            #st.success(f"Files uploaded to Google Drive folder: {city_name}")
         
                
     # --- GHG Inventory ---
