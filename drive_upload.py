@@ -1,7 +1,7 @@
 # drive_upload.py  
 import os
 from googleapiclient.http import MediaFileUpload
-from gdrive_auth import get_drive_service, set_public_permission
+from gdrive_auth import get_drive_service
 
 def _escape_drive_query_value(s: str) -> str:
     """Escape single quotes for Drive query."""
