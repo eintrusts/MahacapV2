@@ -668,7 +668,7 @@ def admin_panel():
         
         if st.button("Submit All CAP Data"):
             st.success("All CAP data submitted successfully! Generating GHG files and uploading to Google Drive...") #Sudeep
-            st.query_params(page="ghg_inventory")
+            st.experimental_set_query_params(page="ghg_inventory")
             
             city_name = city_select  # Use the selected city name
             city_data = st.session_state.city_data[city_name]
