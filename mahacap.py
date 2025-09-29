@@ -348,7 +348,7 @@ def city_page():
     
 # -------------------- Admin Panel --------------------
 def admin_panel():
-    ADMIN_PASSWORD = "eintrust2025"
+    ADMIN_PASSWORD = "123"
 
     if 'admin_logged_in' not in st.session_state:
         st.session_state.admin_logged_in = False
